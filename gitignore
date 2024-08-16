@@ -1,0 +1,6 @@
+.vscode
+*.o
+.gitignore
+build
+*.pb.cc
+*.pb.h
