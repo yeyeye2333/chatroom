@@ -1,0 +1,83 @@
+syntax="proto3";
+package chatroom;
+enum Type{
+    nothing = 0;
+    login = 1;
+    signup = 2;
+    logout = 3;
+    u_search = 4;
+    u_request = 5;
+    u_listreq = 6;
+    u_add = 7;
+    u_del = 8;
+    u_blok = 9;
+    u_unblok = 10;
+    u_message = 11;
+    u_file = 12;
+    u_m_history = 13;
+    u_f_history0 = 14;
+    u_f_history1 = 15;
+    g_create = 16;
+    g_disban = 17;
+    g_request = 18;
+    g_listreq = 19;
+    g_add = 20;
+    g_del = 21;
+    g_search = 22;
+    g_message = 23;
+    g_file = 24;
+    g_quit = 25;
+    g_members = 26;
+    g_addmanager = 27;
+    g_delmanager = 28;
+    g_m_history = 29;
+    g_f_history0 = 30;
+    g_f_history1 = 31;
+    notify_u_req = 32;
+    notify_u_m = 33;
+    notify_u_f = 34;
+    notify_g_req = 35;
+    notify_g_m = 36;
+    notify_g_f = 37;
+    g_confirm=38;
+    fri_confirm=39;
+    heart_check=40;
+}
+message Head{
+    optional bool is=1;
+    optional Type type=2;
+    optional int32 len=3; 
+}
+message File{
+    repeated int32 obj=1;
+    repeated string name=2;
+    // repeated bytes context=3;
+    repeated string date=4;
+    repeated int64 len=5;
+    optional int32 gid=6;
+}
+message Message{
+    repeated int32 obj=1;
+    repeated string context=2;
+    repeated string date=3;
+    optional int32 gid=4;
+}
+message Signup_info{
+    optional int32 uid=1;
+    optional string name=2;
+    optional string password=3;
+}
+message Login_info{
+    optional int32 uid=1;
+    optional string password=2;
+}
+message Group_uid{
+    optional int32 uid=1;
+    optional string name=2;
+}
+message IDs{
+    repeated int32 id=1;
+}
+message Strs{
+    repeated string str=1;
+}

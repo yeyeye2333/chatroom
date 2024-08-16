@@ -1,0 +1,14 @@
+# FROM mysql
+
+# ENV MYSQL_ROOT_PASSWORD=123456
+# ENV MYSQL_DATABASE=chatroom
+# RUN microdnf update
+# RUN microdnf install cmake
+# RUN microdnf install protobuf
+# RUN microdnf install gcc
+# RUN microdnf install g++
+# COPY . /Server
+# # RUN mkdir /Server/server/build
+# # RUN cd /Server/server/build&&cmake ..&&cmake --build .
+
+# CMD bash

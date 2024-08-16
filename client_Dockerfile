@@ -1,0 +1,11 @@
+FROM archlinux
+
+RUN pacman -Syu||true
+RUN pacman -S grpc cmake gcc make pkgconfig --noconfirm
+COPY . /Client
+RUN mkdir /Client/client/build
+RUN cd /Client&&protoc -I=. --cpp_out=. ./chatroom.proto
+RUN cd /Client/client/build&&cmake ..&&cmake --build .
+
+ENTRYPOINT ["/Client/client/build/chatclient"]
+CMD ["127.0.0.1"]
