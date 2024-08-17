@@ -493,7 +493,7 @@ void Client::groupUI()
                     break;
                 }
                 tosend._send(Type::g_addmanager,tosend.in_gid,id);
-                break;修复接收文件时被发送消息会导致文件尾部增大
+                break;
 
             case '6':
                 std::cout<<"输入成员ID:"<<std::flush;

@@ -115,8 +115,11 @@ public:
         {
             ev.data.fd=fd;
             ev.events=EPOLLIN|EPOLLRDHUP;
-            if(epoll_ctl(efd,EPOLL_CTL_ADD,fd,&ev)==-1)return 0;
             ulock.lock();
+            if(epoll_ctl(efd,EPOLL_CTL_ADD,fd,&ev)==-1){
+                ulock.unlock();
+                return 0;
+            }
             fd_map.emplace(fd,fd_key(new Clannel_nocheck(this,fd,0),1));
             cur++;
             ulock.unlock();
@@ -125,8 +128,11 @@ public:
         {
             ev.data.fd=fd;
             ev.events=EPOLLIN|EPOLLRDHUP;
-            if(epoll_ctl(efd,EPOLL_CTL_ADD,fd,&ev)==-1)return 0;
             ulock.lock();
+            if(epoll_ctl(efd,EPOLL_CTL_ADD,fd,&ev)==-1){
+                ulock.unlock();
+                return 0;
+            }
             fd_map.emplace(fd,fd_key(new Clannel_checked(this,fd,0,id),1));
             cur++;
             ulock.unlock();
@@ -146,6 +152,7 @@ public:
         }
         else
         {
+            std::cerr<<"epoll无法删除fd"<<fd<<std::endl;
             ulock.unlock();
             return 0;
         }
@@ -202,6 +209,7 @@ public:
     void heart_beat(int fd)
     {
         try{
+            std::shared_lock tmp_slock(mtx);
             fd_map.at(fd).heart=1;
         }catch(std::out_of_range){}
         return ;
@@ -213,7 +221,12 @@ public:
         epoll_event ev;
         ev.data.fd=fd;
         ev.events=EPOLLRDHUP|EPOLLOUT;
-        if(epoll_ctl(efd,EPOLL_CTL_MOD,fd,&ev)==-1)return false;
+        ulock.lock();
+        if(epoll_ctl(efd,EPOLL_CTL_MOD,fd,&ev)==-1){
+            ulock.unlock();
+            return false;
+        }
+        ulock.unlock();
         return true;
     }
     // 结束发送大量无标签数据，可允许发送其他数据
@@ -222,14 +235,20 @@ public:
         epoll_event ev;
         ev.data.fd=fd;
         ev.events=EPOLLIN|EPOLLRDHUP;
-        if(epoll_ctl(efd,EPOLL_CTL_MOD,fd,&ev)==-1)return false;
+        ulock.lock();
+        if(epoll_ctl(efd,EPOLL_CTL_MOD,fd,&ev)==-1)
+        {
+            ulock.unlock();
+            return false;
+        }
+        ulock.unlock();
         return true;
     }
 private:
     int efd;
     int cur;
     std::map<int,fd_key> fd_map;
-    std::shared_mutex mtx;
+    std::shared_mutex mtx;// efd和fd_map的锁
     std::unique_lock<std::shared_mutex> ulock;
     std::shared_lock<std::shared_mutex> slock;
     Save DB;
