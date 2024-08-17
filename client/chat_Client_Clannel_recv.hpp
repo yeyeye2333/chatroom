@@ -184,6 +184,7 @@ void Clannel_recv::_recv()
                 try{
                     file_o.open(file_path,std::iostream::binary|std::iostream::out);
                     long need_recv=_file.len(0);
+                    std::cerr<<"接收长度"<<_file.len(0)<<std::endl;
                     unique_ptr<char[]>cache;
                     long len;
                     if(need_recv>100000){
@@ -203,9 +204,16 @@ void Clannel_recv::_recv()
                                 continue;
                             }else{
                                 need_recv-=tmp;
+                                if(need_recv>100000){
+                                    len=100000;
+                                }else{
+                                    len=need_recv;
+                                }
                                 file_o.write(cache.get(),tmp);
                             }
+                            std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
                         }
+                        std::cout<<"接受完成"<<std::endl;
                     }
                 }
                 catch(std::invalid_argument){std::cerr<<"错误:文件名无效\n";}

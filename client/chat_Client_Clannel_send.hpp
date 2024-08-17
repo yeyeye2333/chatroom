@@ -84,6 +84,7 @@ void Clannel_send::_send(Type type,int id1,int id2,const string&s1,const string&
                 std::cerr<<"文件无法打开\n";
                 return ;
             }
+            std::cerr<<"发送文件长度"<<(lseek64(in_fd,0,SEEK_END));
             set_File(&sendstr,{id1},{s1},{std::to_string(lseek64(in_fd,0,SEEK_END))});
             realsend(sendstr,Type::u_file);
             u_ptr.reset(new loff_t(0));

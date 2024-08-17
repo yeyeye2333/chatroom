@@ -94,8 +94,12 @@ void Client::initial()
                 std::getline(std::cin,tmp);
                 if(!std::cin)
                 {
-                    close(fd);
-                    exit(EXIT_SUCCESS);
+                    if(std::cin.eof()){
+                        close(fd);
+                        exit(EXIT_SUCCESS);
+                    }else{
+                        std::cin.clear();
+                    }
                 }
             }while(tmp.size()==0);
         }while(tmp.size()==0);
@@ -175,10 +179,15 @@ void Client::mainUI()
                     "6.查看已进群聊\t7.创建群聊\t8.解散群聊\t9.加群\t10.进入群聊\t(按\"q/Q\"结束客户端)\n选择:";
             do{
                 std::getline(std::cin,tmp);
+                
                 if(!std::cin)
                 {
-                    tosend.uid=0;
-                    return;
+                    if(std::cin.eof()){
+                        tosend.uid=0;
+                        return;
+                    }else{
+                        std::cin.clear();
+                    }
                 }
             }while(tmp.size()==0);
         }while(tmp.size()==0);
@@ -313,8 +322,12 @@ void Client::userUI()
                 std::getline(std::cin,tmp);
                 if(!std::cin)
                 {
-                    tosend.in_uid=0;
-                    return;
+                    if(std::cin.eof()){
+                        tosend.in_uid=0;
+                        return;
+                    }else{
+                        std::cin.clear();
+                    }
                 }
             }while(tmp.size()==0);
         }while(tmp.size()==0);
@@ -401,8 +414,12 @@ void Client::groupUI()
                 std::getline(std::cin,tmp);
                 if(!std::cin)
                 {
-                    tosend.in_gid=0;
-                    return;
+                    if(std::cin.eof()){
+                        tosend.in_gid=0;
+                        return;
+                    }else{
+                        std::cin.clear();
+                    }
                 }
             }while(tmp.size()==0);
         }while(tmp.size()==0);
@@ -476,7 +493,7 @@ void Client::groupUI()
                     break;
                 }
                 tosend._send(Type::g_addmanager,tosend.in_gid,id);
-                break;
+                break;修复接收文件时被发送消息会导致文件尾部增大
 
             case '6':
                 std::cout<<"输入成员ID:"<<std::flush;

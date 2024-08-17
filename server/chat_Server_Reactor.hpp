@@ -198,14 +198,12 @@ public:
         ulock.unlock();
         return res;
     }
-    // 现在无锁
+//无锁,需外部加锁
     void heart_beat(int fd)
     {
-        // ulock.lock();
         try{
             fd_map.at(fd).heart=1;
         }catch(std::out_of_range){}
-        // ulock.unlock();
         return ;
     }
     
@@ -372,7 +370,7 @@ void set_Strs(string*s_ptr,const std::vector<string>&str)
 
 //Clannel_checked
 bool rm_in_chatroom(string fname,int id1,int id2=0){
-    if(id2=0){
+    if(id2==0){
         return remove(("/var/lib/chatroom_files/g"+std::to_string(id1)).c_str());
     }else{
         if (remove(("/var/lib/chatroom_files/u"+std::to_string(id1)+std::to_string(id2)+fname).c_str())==-1){
@@ -399,7 +397,7 @@ long append_in_chatroom(const void*tmp, size_t count,string fname,int id1,int id
         close(fd);
     }
     if(ret<=0){
-        std::cerr<<"368 "<<errno<<std::endl;
+        std::cerr<<"append_in_chatroom错误 "<<errno<<std::endl;
     }
     return ret;
 }
@@ -422,6 +420,7 @@ void Clannel_checked::_send(Type type,bool is,std::vector<string> v0,std::vector
         // 需外部锁定
     }else if(type==Type::notify_g_f||type==Type::notify_g_m||type==Type::notify_g_req||
         type==Type::notify_u_f||type==Type::notify_u_m||type==Type::notify_u_req){
+        
         que_mtx.lock();
         if(!tmp_lock.try_lock()){
             // 已锁定，添加至缓冲区中等待发送
@@ -645,7 +644,7 @@ void Clannel_checked::deal()
             chatroom::Strs _str;
             std::vector<std::vector<string>> tmpvv;
             std::vector<string> tmpv;
-            std::cerr<<head.DebugString();
+            // std::cerr<<head.DebugString();
             int tmpi;
             bool is=1;
             long recvd;
@@ -741,7 +740,9 @@ void Clannel_checked::deal()
                         reactor->DB.is_fri(uid,_file.obj(0));
                         ptr.reset(new char[40960]);
                         if (need_recv==0){
-                            rm_in_chatroom(_file.name(0),uid,_file.obj(0));
+                            if(!rm_in_chatroom(_file.name(0),uid,_file.obj(0))){
+                                std::cerr<<"文件删除失败 错误码"<<errno<<std::endl;
+                            }
                             need_recv=_file.len(0);
                         }
                         while(need_recv!=0){
@@ -766,6 +767,8 @@ void Clannel_checked::deal()
                                 }else{
                                     need_recv-=tmp;
                                 }
+                            }else if(errno==EAGAIN){
+                                ret=1;
                             }else{
                                 rm_in_chatroom(_file.name(0),uid,_file.obj(0));
                                 is=0;
@@ -776,7 +779,6 @@ void Clannel_checked::deal()
                                 return;
                             }
                         }
-                        
                         if(is){
                             is=reactor->DB.u_file(uid,_file.obj(0),_file.len(0),_file.name(0));
                         }
@@ -1010,6 +1012,8 @@ void Clannel_checked::deal()
                                 }else{
                                     need_recv-=tmp;
                                 }
+                            }else if(errno==EAGAIN){
+                                ret=1;
                             }else{
                                 rm_in_chatroom(_file.name(0),_file.obj(0));
                                 is=0;
@@ -1170,6 +1174,7 @@ void Clannel_checked::deal()
                         break;
                     
                     default:
+                        std::cerr<<"无法识别类型\n";
                         quit();
                         return;
                 }
