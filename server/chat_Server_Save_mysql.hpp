@@ -58,9 +58,6 @@ public:
         }
         return std::move(tmp);
     }
-    void release(){
-        res.reset();
-    }
 private:
     unique_ptr<MYSQL_RES,void(*)(MYSQL_RES*)> res;
 };

@@ -59,7 +59,7 @@ public:
     void deal();
     void _send(Type type,bool is,std::vector<string> v0={},std::vector<string> v1={},
             std::vector<string> v2={},std::vector<string> v3={},int id=0,int id2=0);
-    std::mutex mtx;
+    std::mutex mtx;// send的锁
 private:
     void realsend(const string& sendstr,bool is,Type type);
     void quit();
@@ -205,7 +205,7 @@ public:
         ulock.unlock();
         return res;
     }
-//无锁,需外部加锁
+    // 无锁,需外部加锁
     void heart_beat(int fd)
     {
         try{
@@ -252,7 +252,7 @@ private:
     std::unique_lock<std::shared_mutex> ulock;
     std::shared_lock<std::shared_mutex> slock;
     Save DB;
-    std::vector<Reactor*> reactors;// send可能竞争，待改（给realsend加锁） 客户端接受文件可能收到混杂消息，待改（存realsend要发的消息）
+    std::vector<Reactor*> reactors;
     int reac_num=0;
 };
 

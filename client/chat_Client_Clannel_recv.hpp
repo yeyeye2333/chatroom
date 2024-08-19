@@ -85,7 +85,7 @@ void Clannel_recv::_recv()
 
         case Type::logout:
             if(_head.is()==0)std::cerr<<"注销失败,账号/密码错误\n";
-            else std::cout<<"注册成功"<<std::endl;
+            else std::cout<<"注销成功"<<std::endl;
             break;
             
         case Type::u_search:

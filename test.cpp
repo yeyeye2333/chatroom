@@ -4,16 +4,17 @@
 #include<map>
 #include<memory>
 #include<string.h>
-#include"server/chat_Server_Save.hpp"
+#include</usr/include/openssl/sha.h>
 using std::string;
+void mysha(string &str){
+    unsigned char md[33]={0};
+    SHA256(reinterpret_cast<const unsigned char *>(str.c_str()),str.size(),md);
+    str=reinterpret_cast<char *>(md);
+}
 int main()
 {
-    mysql_table a;
-    auto b=a.s_f_wh_or("uid,fri_uid,file,time,file_name","u_files",
-                                "((uid=1 and fri_uid=2)or(uid=2 and fri_uid=1))and file_name=aproto","time");;
-    auto c=a.s_f_wh_or("uid,fri_uid,file,time,file_name","u_files",
-                                "((uid=1 and fri_uid=2)or(uid=2 and fri_uid=1))and file_name=aproto","time");
-    std::cerr<<"err"<<a.error_what();
-    
-
+    string tmp;
+    std::cin>>tmp;
+    mysha(tmp);
+    std::cout<<tmp;
 }

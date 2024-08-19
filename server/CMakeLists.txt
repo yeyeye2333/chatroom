@@ -10,6 +10,10 @@ find_package(Protobuf REQUIRED)
 include_directories(${Protobuf_INCLUDE_DIRS})
 target_link_libraries(chatserver PUBLIC ${Protobuf_LIBRARIES})
 
+find_package(OpenSSL REQUIRED)
+include_directories(${OPENSSL_INCLUDE_DIR})
+target_link_libraries(chatserver PUBLIC ${OPENSSL_LIBRARIES})
+
 # find_package(absl REQUIRED)
 # target_link_libraries(chatserver PUBLIC absl::absl)
 file(GLOB LIB_ABSL /usr/lib/libabsl*)

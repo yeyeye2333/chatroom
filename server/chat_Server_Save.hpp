@@ -6,6 +6,7 @@
 #include<vector>
 #include<string>
 #include<mutex>
+#include<openssl/sha.h>
 #define maxu_messages 100
 #define maxu_files 3
 #define maxgroup 3
@@ -16,13 +17,19 @@ extern char cur_time[20];
 
 using std::string;
 
+void mysha(string &str){
+    unsigned char md[33]={0};
+    SHA256(reinterpret_cast<const unsigned char *>(str.c_str()),str.size(),md);
+    str=reinterpret_cast<char *>(md);
+}
+
 class Save{
 public:
     Save():ulock(mtx,std::defer_lock)
     {
         save_mysql.c_val_eng("u_info","uid int not null auto_increment,\
                                         user_name char(30) not null,\
-                                        password char(30) not null,\
+                                        password TINYBLOB not null,\
                                         group_num int not null,\
                                         primary key(uid)");
         save_mysql.c_val_eng("u_relation","uid int not null,\
@@ -127,6 +134,7 @@ public:
 
     bool login(int uid,string password)
     {
+        mysha(password);
         auto tmp=select_u_info(std::to_string(uid));
         if(tmp.row_num()==0)return 0;
         auto row=tmp.getrow(3);
@@ -135,6 +143,7 @@ public:
     }
     int signup(string user_name,string password)
     {
+        mysha(password);
         int tmp;
         ulock.lock();
         if(insert_u_info(password,user_name)==0)tmp=0;
@@ -142,9 +151,9 @@ public:
         ulock.unlock();
         return tmp;
     }
-    bool logout(int uid,const string& password)
+    bool logout(int uid,string password)
     {
-        if(login(uid,password)==0)return 0;
+        if(!login(uid,password))return 0;
         save_mysql.begin();
         bool b1=delete_u_info(std::to_string(uid));
         bool b2=delete_u_relation(std::to_string(uid));
@@ -824,7 +833,7 @@ private:
 private:
     mysql_table save_mysql;
     // redis_text save_redis;
-    static std::mutex mtx;
+    static std::mutex mtx;// 查询last_id使用
     std::unique_lock<std::mutex> ulock;
 };
 std::mutex Save::mtx;

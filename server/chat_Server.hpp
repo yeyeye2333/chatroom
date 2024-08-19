@@ -19,23 +19,11 @@ void handler(Reactor& one)
 {
     while (true)
     {
-        // auto start = std::chrono::high_resolution_clock::now();
-        
         auto pollque=one.poll();
         for(auto tmp:pollque)
         {
-            // auto start2 = std::chrono::high_resolution_clock::now();
             tmp->deal();
-            // auto end2 = std::chrono::high_resolution_clock::now();
-            // std::chrono::duration<double> duration2 = end2 - start2;
-            // std::cout << "deal运行时间: " << duration2.count() << " 秒" << std::endl;
         }
-        // 结束计时
-        // auto end = std::chrono::high_resolution_clock::now();
-
-        // 计算时间差
-        // std::chrono::duration<double> duration = end - start;
-        // std::cout << "poll+deal运行时间: " << duration.count() << " 秒" << std::endl;
     }
 }
 void Server::start()
